@@ -5,6 +5,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: 查看仓库内容
+        run: ls -la
       - name: 清理磁盘
         run: |
           sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/local/share/boost
@@ -18,5 +20,6 @@ jobs:
       - uses: docker/build-push-action@v6
         with:
           context: .
+          file: ./Dockerfile
           push: true
           tags: image.ppinfra.com/${{ secrets.PPIO_REGISTRY_PATH }}/vsr:1.4.0-ppio
