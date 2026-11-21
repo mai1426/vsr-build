@@ -1,0 +1,39 @@
+.github/workflows/build-image.yml
+name: build-vsr-image
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 释放磁盘空间
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: true
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+          swap-storage: true
+
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: 登录 PPIO 镜像仓库
+        uses: docker/login-action@v3
+        with:
+          registry: image.ppinfra.com
+          username: ${{ secrets.PPIO_REGISTRY_USER }}
+          password: ${{ secrets.PPIO_REGISTRY_PASSWORD }}
+
+      - name: 构建并推送
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: image.ppinfra.com/${{ secrets.PPIO_REGISTRY_PATH }}/vsr:1.4.0-ppio
